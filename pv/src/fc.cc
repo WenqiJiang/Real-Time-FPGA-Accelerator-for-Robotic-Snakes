@@ -1,8 +1,11 @@
 #include "fc.h"
 
+#include "constants.h"
+#include "types.h"
+
 template<>
-void fc(FT* fc_input_feature_map, FT* fc_kernel, FT* fc_bias, 
-        FT* fc_output_feature_map) {
+void fc(FDATA_T* fc_input_feature_map, FDATA_T* fc_kernel, FDATA_T* fc_bias, 
+        FDATA_T* fc_output_feature_map) {
   // input:
   // fc_input_feature_map: a vector with a size of FC_INPUT_SIZE
   // fc_kernel: FC_OUTPUT_SIZE x FC_INPUT_SIZE, notice that this kernel is 

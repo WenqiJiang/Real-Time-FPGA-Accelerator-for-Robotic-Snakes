@@ -11,9 +11,9 @@ void lstm(FT* forget_gate_kernel_last_state,
           FT* output_gate_kernel_last_state,
           FT* output_gate_kernel_input_state, FT* output_gate_bias,
           FT* lstm_last_state, FT* lstm_input_state, FT* last_candidate,
-          FT* forget_gate_last_candidate_mul_cache, 
-          FT* input_gate_tanh_gate_mul_cache,
-          FT* tanh_new_candidate_cache,
+          FT* forget_gate_result, FT* input_gate_result, FT* tanh_gate_result,
+          FT* output_gate_result, FT* forget_gate_last_candidate_mul_cache, 
+          FT* input_gate_tanh_gate_mul_cache, FT* tanh_new_candidate_cache,
           FT* new_candidate, FT* lstm_output_state);
 
 // forget gate is a fixed-length computation, related to LSTM_STATE_SIZE

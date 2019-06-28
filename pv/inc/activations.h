@@ -1,5 +1,7 @@
 #pragma once
 
+#include "types.h"
+
 // for fixed length array (LSTM_SIZE), input and output can be the SAME array
 template <typename FT>
 void relu(FT* input_feature_map, FT* output_feature_map);
@@ -17,5 +19,5 @@ template <typename FT>
 void softmax (FT* input_feature_map, FT* output_probability_distribution);
 
 // for fixed length array (FC_OUTPUT_SIZE)
-template <typename FT, typename IT>
-IT argmax(FT* input_array);
+template <typename FT, typename LT>
+LT argmax(FT* input_array);

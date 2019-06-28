@@ -1,6 +1,7 @@
 #pragma once
 
 #define IDATA_T int
+#define LDATA_T int
 
 #ifdef __SDSOC__
 
