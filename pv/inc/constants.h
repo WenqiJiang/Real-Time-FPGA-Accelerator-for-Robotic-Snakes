@@ -1,7 +1,12 @@
 #pragma once
 
-#define LSTM_STATE_SIZE 512
-#define LSTM_INPUT_SIZE 128
+// Layer 1
+#define LSTM_INPUT_SIZE_1 14
+#define LSTM_STATE_SIZE_1 16
 
-#define FC_INPUT_SIZE LSTM_STATE_SIZE
-#define FC_OUTPUT_SIZE 16
+// Layer 2
+#define LSTM_INPUT_SIZE_2 LSTM_STATE_SIZE_1
+#define LSTM_STATE_SIZE_2 16
+
+#define FC_INPUT_SIZE LSTM_STATE_SIZE_2
+#define FC_OUTPUT_SIZE 10

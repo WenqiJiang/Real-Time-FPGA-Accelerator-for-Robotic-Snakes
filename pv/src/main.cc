@@ -10,70 +10,128 @@
 
 int main (int argc, char* argv[]) {
 
-  // input states
-  FDATA_T* lstm_input_state = 
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_INPUT_SIZE);
-  FDATA_T* lstm_last_state = 
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
-  FDATA_T* lstm_last_candidate = 
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
 
-  // lstm weights
-  FDATA_T* forget_gate_kernel_last_state =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE * LSTM_STATE_SIZE);
-  FDATA_T* forget_gate_kernel_input_state =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE * LSTM_INPUT_SIZE);
-  FDATA_T* forget_gate_bias =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
-  FDATA_T* input_gate_kernel_last_state =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE * LSTM_STATE_SIZE);
-  FDATA_T* input_gate_kernel_input_state =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE * LSTM_INPUT_SIZE);
-  FDATA_T* input_gate_bias =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
-  FDATA_T* tanh_gate_kernel_last_state =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE * LSTM_STATE_SIZE);
-  FDATA_T* tanh_gate_kernel_input_state =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE * LSTM_INPUT_SIZE);
-  FDATA_T* tanh_gate_bias =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
-  FDATA_T* output_gate_kernel_last_state =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE * LSTM_STATE_SIZE);
-  FDATA_T* output_gate_kernel_input_state =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE * LSTM_INPUT_SIZE);
-  FDATA_T* output_gate_bias =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
+  // LSTM Layer 1 weights
+  FDATA_T* forget_gate_kernel_last_state_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1);
+  FDATA_T* forget_gate_kernel_input_state_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1);
+  FDATA_T* forget_gate_bias_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T* input_gate_kernel_last_state_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1);
+  FDATA_T* input_gate_kernel_input_state_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1);
+  FDATA_T* input_gate_bias_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T* tanh_gate_kernel_last_state_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1);
+  FDATA_T* tanh_gate_kernel_input_state_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1);
+  FDATA_T* tanh_gate_bias_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T* output_gate_kernel_last_state_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1);
+  FDATA_T* output_gate_kernel_input_state_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1);
+  FDATA_T* output_gate_bias_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+
+  // LSTM Layer 2 weights
+  FDATA_T* forget_gate_kernel_last_state_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2);
+  FDATA_T* forget_gate_kernel_input_state_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2);
+  FDATA_T* forget_gate_bias_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T* input_gate_kernel_last_state_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2);
+  FDATA_T* input_gate_kernel_input_state_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2);
+  FDATA_T* input_gate_bias_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T* tanh_gate_kernel_last_state_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2);
+  FDATA_T* tanh_gate_kernel_input_state_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2);
+  FDATA_T* tanh_gate_bias_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T* output_gate_kernel_last_state_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2);
+  FDATA_T* output_gate_kernel_input_state_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T)* LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2);
+  FDATA_T* output_gate_bias_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
 
   // lstm caches (reuse this case in lstm cells, avoid malloc repeatly
-  FDATA_T* forget_gate_result =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
-  FDATA_T* input_gate_result =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
-  FDATA_T* tanh_gate_result =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
-  FDATA_T* output_gate_result =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
-  FDATA_T* forget_gate_last_candidate_mul_cache = 
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
-  FDATA_T* input_gate_tanh_gate_mul_cache =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
-  FDATA_T* tanh_new_candidate_cache =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
+  // Layer 1
+  FDATA_T* forget_gate_result_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T* input_gate_result_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T* tanh_gate_result_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T* output_gate_result_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T* forget_gate_last_candidate_mul_cache_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T* input_gate_tanh_gate_mul_cache_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T* tanh_new_candidate_cache_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+
+  // Layer 2
+  FDATA_T* forget_gate_result_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T* input_gate_result_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T* tanh_gate_result_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T* output_gate_result_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T* forget_gate_last_candidate_mul_cache_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T* input_gate_tanh_gate_mul_cache_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T* tanh_new_candidate_cache_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+
+  // input states
+  // Layer 1
+  FDATA_T* lstm_input_state_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_INPUT_SIZE_1);
+  FDATA_T* lstm_last_state_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T* lstm_last_candidate_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+
+  // Layer 2
+  FDATA_T* lstm_last_state_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T* lstm_last_candidate_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
 
   // lstm outputs
-  FDATA_T* new_candidate =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
-  FDATA_T* lstm_output_state =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE);
+  // Layer 1
+  FDATA_T* new_candidate_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T* lstm_output_state_1 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+
+  // Layer 2
+  FDATA_T* new_candidate_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T* lstm_output_state_2 =
+      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
 
   // fc weights
-  FDATA_T* fc_kernel = 
+  FDATA_T* fc_kernel =
       (FDATA_T*) MALLOC(sizeof(FDATA_T) * FC_OUTPUT_SIZE * FC_INPUT_SIZE);
-  FDATA_T* fc_bias = 
+  FDATA_T* fc_bias =
       (FDATA_T*) MALLOC(sizeof(FDATA_T) * FC_OUTPUT_SIZE);
 
   // fc output
-  FDATA_T* fc_output_feature_map = 
+  FDATA_T* fc_output_feature_map =
       (FDATA_T*) MALLOC(sizeof(FDATA_T) * FC_OUTPUT_SIZE);
 
   // TODO: INLDATA_T
@@ -82,58 +140,101 @@ int main (int argc, char* argv[]) {
   //
   //
 
+  printf ("INFO: Start Inferencen\n");
   // compute
-  lstm<FDATA_T>(
-      forget_gate_kernel_last_state, forget_gate_kernel_input_state,
-      forget_gate_bias, input_gate_kernel_last_state,
-      input_gate_kernel_input_state, input_gate_bias,
-      tanh_gate_kernel_last_state, tanh_gate_kernel_input_state,
-      tanh_gate_bias, output_gate_kernel_last_state,
-      output_gate_kernel_input_state, output_gate_bias, lstm_last_state,
-      lstm_input_state, lstm_last_candidate, forget_gate_result,
-      input_gate_result, tanh_gate_result, output_gate_result, 
-      forget_gate_last_candidate_mul_cache, input_gate_tanh_gate_mul_cache,
-      tanh_new_candidate_cache, new_candidate, lstm_output_state);
+  // Layer 1
+  lstm<FDATA_T, LSTM_STATE_SIZE_1, LSTM_INPUT_SIZE_1>(
+      forget_gate_kernel_last_state_1, forget_gate_kernel_input_state_1,
+      forget_gate_bias_1, input_gate_kernel_last_state_1,
+      input_gate_kernel_input_state_1, input_gate_bias_1,
+      tanh_gate_kernel_last_state_1, tanh_gate_kernel_input_state_1,
+      tanh_gate_bias_1, output_gate_kernel_last_state_1,
+      output_gate_kernel_input_state_1, output_gate_bias_1, lstm_last_state_1,
+      lstm_input_state_1, lstm_last_candidate_1, forget_gate_result_1,
+      input_gate_result_1, tanh_gate_result_1, output_gate_result_1,
+      forget_gate_last_candidate_mul_cache_1, input_gate_tanh_gate_mul_cache_1,
+      tanh_new_candidate_cache_1, new_candidate_1, lstm_output_state_1);
 
-  fc<FDATA_T>(lstm_output_state, fc_kernel, fc_bias, fc_output_feature_map);
-  for (LDATA_T i = 0; i < FC_OUTPUT_SIZE; i++) 
+  // Layer 2
+  lstm<FDATA_T, LSTM_STATE_SIZE_2, LSTM_INPUT_SIZE_2>(
+      forget_gate_kernel_last_state_2, forget_gate_kernel_input_state_2,
+      forget_gate_bias_2, input_gate_kernel_last_state_2,
+      input_gate_kernel_input_state_2, input_gate_bias_2,
+      tanh_gate_kernel_last_state_2, tanh_gate_kernel_input_state_2,
+      tanh_gate_bias_2, output_gate_kernel_last_state_2,
+      output_gate_kernel_input_state_2, output_gate_bias_2, lstm_last_state_2,
+      lstm_output_state_1, lstm_last_candidate_2, forget_gate_result_2,
+      input_gate_result_2, tanh_gate_result_2, output_gate_result_2,
+      forget_gate_last_candidate_mul_cache_2, input_gate_tanh_gate_mul_cache_2,
+      tanh_new_candidate_cache_2, new_candidate_2, lstm_output_state_2);
+
+  // Dense
+  fc<FDATA_T>(lstm_output_state_2, fc_kernel, fc_bias, fc_output_feature_map);
+
+  printf("INFO: End Inference\n");
+#ifdef VERBOSE
+  for (LDATA_T i = 0; i < FC_OUTPUT_SIZE; i++)
     printf("%f\t", fc_output_feature_map[i]);
   printf("\n");
+#endif
 
   LDATA_T result = argmax<FDATA_T, LDATA_T>(fc_output_feature_map);
   printf("INFO: result class -> %d\n", result);
 
   // lstm states
-  MFREE(lstm_input_state);
-  MFREE(lstm_last_state);
-  MFREE(lstm_last_candidate);
+  MFREE(lstm_input_state_1);
+  MFREE(lstm_last_state_1);
+  MFREE(lstm_last_candidate_1);
+  MFREE(lstm_last_state_2);
+  MFREE(lstm_last_candidate_2);
 
   // lstm weights
-  MFREE(forget_gate_kernel_last_state);
-  MFREE(forget_gate_kernel_input_state);
-  MFREE(forget_gate_bias);
-  MFREE(input_gate_kernel_last_state);
-  MFREE(input_gate_kernel_input_state);
-  MFREE(input_gate_bias);
-  MFREE(tanh_gate_kernel_last_state);
-  MFREE(tanh_gate_kernel_input_state);
-  MFREE(tanh_gate_bias);
-  MFREE(output_gate_kernel_last_state);
-  MFREE(output_gate_kernel_input_state);
-  MFREE(output_gate_bias);
+  MFREE(forget_gate_kernel_last_state_1);
+  MFREE(forget_gate_kernel_input_state_1);
+  MFREE(forget_gate_bias_1);
+  MFREE(input_gate_kernel_last_state_1);
+  MFREE(input_gate_kernel_input_state_1);
+  MFREE(input_gate_bias_1);
+  MFREE(tanh_gate_kernel_last_state_1);
+  MFREE(tanh_gate_kernel_input_state_1);
+  MFREE(tanh_gate_bias_1);
+  MFREE(output_gate_kernel_last_state_1);
+  MFREE(output_gate_kernel_input_state_1);
+  MFREE(output_gate_bias_1);
+  MFREE(forget_gate_kernel_last_state_2);
+  MFREE(forget_gate_kernel_input_state_2);
+  MFREE(forget_gate_bias_2);
+  MFREE(input_gate_kernel_last_state_2);
+  MFREE(input_gate_kernel_input_state_2);
+  MFREE(input_gate_bias_2);
+  MFREE(tanh_gate_kernel_last_state_2);
+  MFREE(tanh_gate_kernel_input_state_2);
+  MFREE(tanh_gate_bias_2);
+  MFREE(output_gate_kernel_last_state_2);
+  MFREE(output_gate_kernel_input_state_2);
+  MFREE(output_gate_bias_2);
 
   // lstm caches
-  MFREE(forget_gate_result);
-  MFREE(input_gate_result);
-  MFREE(tanh_gate_result);
-  MFREE(output_gate_result);
-  MFREE(forget_gate_last_candidate_mul_cache);
-  MFREE(input_gate_tanh_gate_mul_cache);
-  MFREE(tanh_new_candidate_cache);
-  
+  MFREE(forget_gate_result_1);
+  MFREE(input_gate_result_1);
+  MFREE(tanh_gate_result_1);
+  MFREE(output_gate_result_1);
+  MFREE(forget_gate_last_candidate_mul_cache_1);
+  MFREE(input_gate_tanh_gate_mul_cache_1);
+  MFREE(tanh_new_candidate_cache_1);
+  MFREE(forget_gate_result_2);
+  MFREE(input_gate_result_2);
+  MFREE(tanh_gate_result_2);
+  MFREE(output_gate_result_2);
+  MFREE(forget_gate_last_candidate_mul_cache_2);
+  MFREE(input_gate_tanh_gate_mul_cache_2);
+  MFREE(tanh_new_candidate_cache_2);
+
   // lstm outputs
-  MFREE(new_candidate);
-  MFREE(lstm_output_state);
+  MFREE(new_candidate_1);
+  MFREE(lstm_output_state_1);
+  MFREE(new_candidate_2);
+  MFREE(lstm_output_state_2);
 
   // fc weights
   MFREE(fc_kernel);

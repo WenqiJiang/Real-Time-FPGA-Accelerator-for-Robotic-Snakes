@@ -3,15 +3,15 @@
 #include "types.h"
 
 // for fixed length array (LSTM_SIZE), input and output can be the SAME array
-template <typename FT>
+template <typename FT, const int lstm_state_size>
 void relu(FT* input_feature_map, FT* output_feature_map);
 
 // for fixed length array (LSTM_SIZE), input and output can be the SAME array
-template <typename FT>
+template <typename FT, const int lstm_state_size>
 void tanh(FT* input_feature_map, FT* output_feature_map);
 
 // for fixed length array (LSTM_SIZE), input and output can be the SAME array
-template <typename FT>
+template <typename FT, const int lstm_state_size>
 void sigmoid(FT* input_feature_map, FT* output_feature_map);
 
 // for fixed length array (FC_OUTPUT_SIZE)
