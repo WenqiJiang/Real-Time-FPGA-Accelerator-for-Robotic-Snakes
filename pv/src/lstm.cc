@@ -26,7 +26,7 @@ void gate_template(const FDATA_T* kernel_last_state,
   // result: LSTM_STATE_SIZE
 
   // initialization
-  zero_init<FDATA_T>(result, lstm_state_size);
+  zero_init<FDATA_T, LDATA_T>(result, lstm_state_size);
 
   // last state
   for (LDATA_T result_idx = 0; result_idx < lstm_state_size; result_idx++) {
@@ -76,11 +76,11 @@ void forget_gate(const FDATA_T* forget_gate_kernel_last_state,
   // output:
   // forget_gate_result: LSTM_STATE_SIZE
 
-  gate_template<FDATA_T, lstm_state_size, lstm_input_size>(
+  gate_template<lstm_state_size, lstm_input_size>(
       forget_gate_kernel_last_state, forget_gate_kernel_input_state,
       forget_gate_bias, lstm_last_state, lstm_input_state, forget_gate_result);
 
-  sigmoid<FDATA_T, lstm_state_size>(forget_gate_result, forget_gate_result);
+  sigmoid<lstm_state_size>(forget_gate_result, forget_gate_result);
 }
 
 template <const int lstm_state_size, const int lstm_input_size>
@@ -100,11 +100,11 @@ void input_gate(const FDATA_T* input_gate_kernel_last_state,
   // output:
   // input_gate_result: LSTM_STATE_SIZE
 
-  gate_template<FDATA_T, lstm_state_size, lstm_input_size>(
+  gate_template<lstm_state_size, lstm_input_size>(
       input_gate_kernel_last_state, input_gate_kernel_input_state,
       input_gate_bias, lstm_last_state, lstm_input_state, input_gate_result);
 
-  sigmoid<FDATA_T, lstm_state_size>(input_gate_result, input_gate_result);
+  sigmoid<lstm_state_size>(input_gate_result, input_gate_result);
 }
 
 template <const int lstm_state_size, const int lstm_input_size>
@@ -124,11 +124,11 @@ void tanh_gate(const FDATA_T* tanh_gate_kernel_last_state,
   // output:
   // tanh_gate_result: LSTM_STATE_SIZE
 
-  gate_template<FDATA_T, lstm_state_size, lstm_input_size>(
+  gate_template<lstm_state_size, lstm_input_size>(
       tanh_gate_kernel_last_state, tanh_gate_kernel_input_state,
       tanh_gate_bias, lstm_last_state, lstm_input_state, tanh_gate_result);
 
-  tanh<FDATA_T, lstm_state_size>(tanh_gate_result, tanh_gate_result);
+  tanh<lstm_state_size>(tanh_gate_result, tanh_gate_result);
 }
 
 template <const int lstm_state_size, const int lstm_input_size>
@@ -149,11 +149,11 @@ void output_gate(const FDATA_T* output_gate_kernel_last_state,
   // output:
   // output_gate_result: LSTM_STATE_SIZE
 
-  gate_template<FDATA_T, lstm_state_size, lstm_input_size>(
+  gate_template<lstm_state_size, lstm_input_size>(
       output_gate_kernel_last_state, output_gate_kernel_input_state,
       output_gate_bias, lstm_last_state, lstm_input_state, output_gate_result);
 
-  sigmoid<FDATA_T, lstm_state_size>(output_gate_result, output_gate_result);
+  sigmoid<lstm_state_size>(output_gate_result, output_gate_result);
 }
 
 template <const int lstm_state_size>
@@ -203,27 +203,27 @@ void lstm(const FDATA_T* forget_gate_kernel_last_state,
   //  both with size of LSTM_STATE_SIZE
 
   // 4 gates
-  forget_gate<FDATA_T, lstm_state_size, lstm_input_size>(
+  forget_gate<lstm_state_size, lstm_input_size>(
       forget_gate_kernel_last_state, forget_gate_kernel_input_state,
       forget_gate_bias, lstm_last_state, lstm_input_state, forget_gate_result);
 
-  input_gate<FDATA_T, lstm_state_size, lstm_input_size>(
+  input_gate<lstm_state_size, lstm_input_size>(
       input_gate_kernel_last_state, input_gate_kernel_input_state,
       input_gate_bias, lstm_last_state, lstm_input_state, input_gate_result);
 
-  tanh_gate<FDATA_T, lstm_state_size, lstm_input_size>(
+  tanh_gate<lstm_state_size, lstm_input_size>(
       tanh_gate_kernel_last_state, tanh_gate_kernel_input_state,
       tanh_gate_bias, lstm_last_state, lstm_input_state, tanh_gate_result);
 
-  output_gate<FDATA_T, lstm_state_size, lstm_input_size>(
+  output_gate<lstm_state_size, lstm_input_size>(
       output_gate_kernel_last_state, output_gate_kernel_input_state,
       output_gate_bias, lstm_last_state, lstm_input_state, output_gate_result);
 
   // elementwise mul
-  elementwise_mul<FDATA_T, lstm_state_size>(
+  elementwise_mul<lstm_state_size>(
       forget_gate_result, last_candidate, forget_gate_last_candidate_mul_cache);
 
-  elementwise_mul<FDATA_T, lstm_state_size>(
+  elementwise_mul<lstm_state_size>(
       input_gate_result, tanh_gate_result, input_gate_tanh_gate_mul_cache);
 
   // compute new candidate
@@ -234,7 +234,7 @@ void lstm(const FDATA_T* forget_gate_kernel_last_state,
   }
 
   // tanh new candidate
-  tanh<FDATA_T, lstm_state_size>(new_candidate, tanh_new_candidate_cache);
+  tanh<lstm_state_size>(new_candidate, tanh_new_candidate_cache);
 
   // compute output state
   for (LDATA_T result_idx = 0; result_idx < lstm_state_size; result_idx++) {

@@ -1,5 +1,8 @@
 #include <cstdio>
 #include <cstdlib>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include "activations.h"
 #include "constants.h"
@@ -141,9 +144,15 @@ int main (int argc, char* argv[]) {
   //
 
   printf ("INFO: Start Inferencen\n");
+
+#ifdef PROFILING
+  struct timespec start, finish;
+  clock_gettime(CLOCK_REALTIME, &start);
+#endif
+
   // compute
   // Layer 1
-  lstm<FDATA_T, LSTM_STATE_SIZE_1, LSTM_INPUT_SIZE_1>(
+  lstm<LSTM_STATE_SIZE_1, LSTM_INPUT_SIZE_1>(
       forget_gate_kernel_last_state_1, forget_gate_kernel_input_state_1,
       forget_gate_bias_1, input_gate_kernel_last_state_1,
       input_gate_kernel_input_state_1, input_gate_bias_1,
@@ -156,7 +165,7 @@ int main (int argc, char* argv[]) {
       tanh_new_candidate_cache_1, new_candidate_1, lstm_output_state_1);
 
   // Layer 2
-  lstm<FDATA_T, LSTM_STATE_SIZE_2, LSTM_INPUT_SIZE_2>(
+  lstm<LSTM_STATE_SIZE_2, LSTM_INPUT_SIZE_2>(
       forget_gate_kernel_last_state_2, forget_gate_kernel_input_state_2,
       forget_gate_bias_2, input_gate_kernel_last_state_2,
       input_gate_kernel_input_state_2, input_gate_bias_2,
@@ -170,6 +179,17 @@ int main (int argc, char* argv[]) {
 
   // Dense
   fc<FDATA_T>(lstm_output_state_2, fc_kernel, fc_bias, fc_output_feature_map);
+
+#ifdef PROFILING
+  clock_gettime(CLOCK_REALTIME, &finish);
+
+  long seconds = finish.tv_sec - start.tv_sec;
+  long ns = finish.tv_nsec - start.tv_nsec;
+
+  printf("seconds: %ld\n", seconds);
+  printf("nanoseconds: %ld\n", ns);
+  printf("total seconds: %e\n", (double)seconds + (double)ns/(double)1000000000);
+#endif
 
   printf("INFO: End Inference\n");
 #ifdef VERBOSE
