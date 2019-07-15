@@ -243,3 +243,47 @@ void lstm(const FDATA_T* forget_gate_kernel_last_state,
   }
 }
 
+// instantiation
+template void lstm<LSTM_STATE_SIZE_1, LSTM_INPUT_SIZE_1>
+    (const FDATA_T* forget_gate_kernel_last_state,
+          const FDATA_T* forget_gate_kernel_input_state,
+          const FDATA_T* forget_gate_bias,
+          const FDATA_T* input_gate_kernel_last_state,
+          const FDATA_T* input_gate_kernel_input_state,
+          const FDATA_T* input_gate_bias,
+          const FDATA_T* tanh_gate_kernel_last_state,
+          const FDATA_T* tanh_gate_kernel_input_state,
+          const FDATA_T* tanh_gate_bias,
+          const FDATA_T* output_gate_kernel_last_state,
+          const FDATA_T* output_gate_kernel_input_state,
+          const FDATA_T* output_gate_bias,
+          const FDATA_T* lstm_last_state, const FDATA_T* lstm_input_state,
+          const FDATA_T* last_candidate, FDATA_T* forget_gate_result,
+          FDATA_T* input_gate_result, FDATA_T* tanh_gate_result,
+          FDATA_T* output_gate_result,
+          FDATA_T* forget_gate_last_candidate_mul_cache,
+          FDATA_T* input_gate_tanh_gate_mul_cache,
+          FDATA_T* tanh_new_candidate_cache,
+          FDATA_T* new_candidate, FDATA_T* lstm_output_state);
+
+template void lstm<LSTM_STATE_SIZE_2, LSTM_INPUT_SIZE_2>
+    (const FDATA_T* forget_gate_kernel_last_state,
+          const FDATA_T* forget_gate_kernel_input_state,
+          const FDATA_T* forget_gate_bias,
+          const FDATA_T* input_gate_kernel_last_state,
+          const FDATA_T* input_gate_kernel_input_state,
+          const FDATA_T* input_gate_bias,
+          const FDATA_T* tanh_gate_kernel_last_state,
+          const FDATA_T* tanh_gate_kernel_input_state,
+          const FDATA_T* tanh_gate_bias,
+          const FDATA_T* output_gate_kernel_last_state,
+          const FDATA_T* output_gate_kernel_input_state,
+          const FDATA_T* output_gate_bias,
+          const FDATA_T* lstm_last_state, const FDATA_T* lstm_input_state,
+          const FDATA_T* last_candidate, FDATA_T* forget_gate_result,
+          FDATA_T* input_gate_result, FDATA_T* tanh_gate_result,
+          FDATA_T* output_gate_result,
+          FDATA_T* forget_gate_last_candidate_mul_cache,
+          FDATA_T* input_gate_tanh_gate_mul_cache,
+          FDATA_T* tanh_new_candidate_cache,
+          FDATA_T* new_candidate, FDATA_T* lstm_output_state);

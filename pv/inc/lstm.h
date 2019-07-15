@@ -1,5 +1,6 @@
 #pragma once
 
+#include "constants.h"
 #include "types.h"
 
 // the complete LSTM cell
@@ -67,3 +68,4 @@ void gate_template(const FDATA_T* kernel_last_state,
 template <const int lstm_state_size>
 void elementwise_mul(const FDATA_T* input_vector1, const FDATA_T* input_vector2,
                      FDATA_T* output_vector);
+

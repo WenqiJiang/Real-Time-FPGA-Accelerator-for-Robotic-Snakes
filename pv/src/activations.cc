@@ -70,3 +70,11 @@ LDATA_T argmax(FDATA_T* input_array) {
 
   return max_idx;
 }
+
+// instantiation
+template void tanh<LSTM_STATE_SIZE_1>(
+    FDATA_T* input_feature_map, FDATA_T* output_feature_map);
+
+template void sigmoid<LSTM_STATE_SIZE_1>(
+    FDATA_T* input_feature_map, FDATA_T* output_feature_map);
+
