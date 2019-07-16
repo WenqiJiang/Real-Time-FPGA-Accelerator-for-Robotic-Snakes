@@ -53,11 +53,11 @@ void softmax (FDATA_T* input_feature_map,
 }
 
 template <>
-LDATA_T argmax(FDATA_T* input_array) {
+IDATA_T argmax(FDATA_T* input_array) {
   // for fixed length array (FC_OUTPUT_SIZE)
 
   // initialization
-  LDATA_T max_idx = 0;
+  IDATA_T max_idx = 0;
   FDATA_T max_val = input_array[0];
 
   // find max
