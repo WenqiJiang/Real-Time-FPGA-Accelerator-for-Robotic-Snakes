@@ -1,0 +1,3 @@
+-I../inc/activation.h
+-Iinc/activation.h
+-Iinc/
