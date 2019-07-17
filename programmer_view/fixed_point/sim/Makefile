@@ -17,7 +17,7 @@ ifndef V
 	QUIET_CLEAN         = @echo 'MAKE:' CLEAN ${PWD};
 endif
 
-TARGET = c-rnn
+TARGET = c-lstm
 
 all: check-env release
 
@@ -78,7 +78,7 @@ VPATH += ../inc
 VPATH += ../src
 
 CXX_SOURCES :=
-CXX_SOURCES += activation.cc
+CXX_SOURCES += activations.cc
 CXX_SOURCES += fc.cc
 CXX_SOURCES += lstm.cc
 CXX_SOURCES += main.cc
@@ -86,7 +86,7 @@ CXX_SOURCES += utils.cc
 CXX_SOURCES += wrapper.cc
 
 CXX_HEADERS :=
-CXX_HEADERS += activation.h
+CXX_HEADERS += activations.h
 # CXX_HEADERS += config.h
 CXX_HEADERS += constants.h
 CXX_HEADERS += fc.h
