@@ -67,6 +67,7 @@ CXX_SOURCES += wrapper.cc
 
 CXX_HEADERS :=
 CXX_HEADERS += activations.h
+CXX_HEADERS += configs.h
 CXX_HEADERS += constants.h
 CXX_HEADERS += fc.h
 CXX_HEADERS += lstm.h

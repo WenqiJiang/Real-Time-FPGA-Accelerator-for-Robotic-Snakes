@@ -4,12 +4,15 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
+#include "configs.h"
 #include "constants.h"
 #include "types.h"
 #include "utils.h"
 #include "wrapper.h"
 
 int main (int argc, char* argv[]) {
+
+  printf("INFO: Allocating memory and loading weights...\n");
 
   // LSTM Layer 1 weights
   FDATA_T* forget_gate_kernel_last_state_1 =
@@ -75,7 +78,69 @@ int main (int argc, char* argv[]) {
 
   IDATA_T* results = (IDATA_T*) MALLOC(sizeof(IDATA_T) * COMPUTE_TIME);
 
-  printf ("INFO: Start Inferencen\n");
+  // Load weights
+  load_data<FDATA_T, LDATA_T> (FORGET_GATE_KERNEL_LAST_STATE_1,
+      forget_gate_kernel_last_state_1, LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1);
+  load_data<FDATA_T, LDATA_T> (FORGET_GATE_KERNEL_INPUT_STATE_1,
+      forget_gate_kernel_input_state_1 ,LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1);
+  load_data<FDATA_T, LDATA_T> (FORGET_GATE_BIAS_1,
+      forget_gate_bias_1 ,LSTM_STATE_SIZE_1);
+  load_data<FDATA_T, LDATA_T> (INPUT_GATE_KERNEL_LAST_STATE_1,
+      input_gate_kernel_last_state_1 ,LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1);
+  load_data<FDATA_T, LDATA_T> (INPUT_GATE_KERNEL_INPUT_STATE_1,
+      input_gate_kernel_input_state_1 ,LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1);
+  load_data<FDATA_T, LDATA_T> (INPUT_GATE_BIAS_1,
+      input_gate_bias_1 ,LSTM_STATE_SIZE_1);
+  load_data<FDATA_T, LDATA_T> (TANH_GATE_KERNEL_LAST_STATE_1,
+      tanh_gate_kernel_last_state_1 ,LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1);
+  load_data<FDATA_T, LDATA_T> (TANH_GATE_KERNEL_INPUT_STATE_1,
+      tanh_gate_kernel_input_state_1 ,LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1);
+  load_data<FDATA_T, LDATA_T> (TANH_GATE_BIAS_1,
+      tanh_gate_bias_1 ,LSTM_STATE_SIZE_1);
+  load_data<FDATA_T, LDATA_T> (OUTPUT_GATE_KERNEL_LAST_STATE_1,
+      output_gate_kernel_last_state_1 ,LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1);
+  load_data<FDATA_T, LDATA_T> (OUTPUT_GATE_KERNEL_INPUT_STATE_1,
+      output_gate_kernel_input_state_1 ,LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1);
+  load_data<FDATA_T, LDATA_T> (OUTPUT_GATE_BIAS_1,
+      output_gate_bias_1 ,LSTM_STATE_SIZE_1);
+
+  // LSTM Layer 2 weights
+  load_data<FDATA_T, LDATA_T> (FORGET_GATE_KERNEL_LAST_STATE_2,
+      forget_gate_kernel_last_state_2 ,LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2);
+  load_data<FDATA_T, LDATA_T> (FORGET_GATE_KERNEL_INPUT_STATE_2,
+      forget_gate_kernel_input_state_2 ,LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2);
+  load_data<FDATA_T, LDATA_T> (FORGET_GATE_BIAS_2,
+      forget_gate_bias_2 ,LSTM_STATE_SIZE_2);
+  load_data<FDATA_T, LDATA_T> (INPUT_GATE_KERNEL_LAST_STATE_2,
+      input_gate_kernel_last_state_2 ,LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2);
+  load_data<FDATA_T, LDATA_T> (INPUT_GATE_KERNEL_INPUT_STATE_2,
+      input_gate_kernel_input_state_2 ,LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2);
+  load_data<FDATA_T, LDATA_T> (INPUT_GATE_BIAS_2,
+      input_gate_bias_2 ,LSTM_STATE_SIZE_2);
+  load_data<FDATA_T, LDATA_T> (TANH_GATE_KERNEL_LAST_STATE_2,
+      tanh_gate_kernel_last_state_2 ,LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2);
+  load_data<FDATA_T, LDATA_T> (TANH_GATE_KERNEL_INPUT_STATE_2,
+      tanh_gate_kernel_input_state_2 ,LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2);
+  load_data<FDATA_T, LDATA_T> (TANH_GATE_BIAS_2,
+      tanh_gate_bias_2 ,LSTM_STATE_SIZE_2);
+  load_data<FDATA_T, LDATA_T> (OUTPUT_GATE_KERNEL_LAST_STATE_2,
+      output_gate_kernel_last_state_2 ,LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2);
+  load_data<FDATA_T, LDATA_T> (OUTPUT_GATE_KERNEL_INPUT_STATE_2,
+      output_gate_kernel_input_state_2 ,LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2);
+  load_data<FDATA_T, LDATA_T> (OUTPUT_GATE_BIAS_2,
+      output_gate_bias_2 ,LSTM_STATE_SIZE_2);
+
+  // Layer 1, a super large array, contain the inputs of all steps
+  load_data<FDATA_T, LDATA_T> (LSTM_INPUT_STATE_1,
+      lstm_input_state_1 ,LSTM_INPUT_SIZE_1 * COMPUTE_TIME);
+
+  // fc weights
+  load_data<FDATA_T, LDATA_T> (FC_KERNEL,
+      fc_kernel ,FC_OUTPUT_SIZE * FC_INPUT_SIZE);
+  load_data<FDATA_T, LDATA_T> (FC_BIAS, fc_bias ,FC_OUTPUT_SIZE);
+
+  printf("INFO: Finished allocating memory and loading weights\n");
+  printf ("INFO: Start Inference\n");
 
   wrapper(forget_gate_kernel_last_state_1, forget_gate_kernel_input_state_1,
           forget_gate_bias_1, input_gate_kernel_last_state_1,

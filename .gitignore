@@ -1,3 +1,5 @@
 *.o
 *.out
 c-lstm
+*kernel*.txt
+*bias*.txt
