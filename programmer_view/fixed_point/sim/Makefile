@@ -17,19 +17,39 @@ ifndef V
 	QUIET_CLEAN         = @echo 'MAKE:' CLEAN ${PWD};
 endif
 
-TARGET = c-lstm
+TARGET = c-rnn
 
-all: release
+all: check-env release
+
+check-env:
+ifndef XILINX_VIVADO
+	$(error XILINX_VIVADO is undefined)
+endif
 
 CC = clang++
-#CC = g++
 
 INCDIR :=
 INCDIR += -I../inc
+INCDIR += -I$(XILINX_VIVADO)/include
+
+# For Windows machines: provide the path to your Vivado installation
+#INCDIR += -IC:/Xilinx/Vivado/2019.1/include
 
 CXX_FLAGS :=
 CXX_FLAGS += -Wall
-CXX_FLAGS += -pedantic
+
+# Use the following flags to compile "hls_math.h" for fixed-point arithmetic.
+CXX_FLAGS += -Wno-unknown-pragmas # disable HLS pragmas in PV
+CXX_FLAGS += -Wno-unused-label # disable HLS labels in PV
+CXX_FLAGS += -Wno-unused-variable
+#CXX_FLAGS += -pedantic
+
+# Fixed point configuration. Those variables should be specified on the command
+# line, for example:
+# FXD_W_LENGTH=32 FXD_I_LENGTH=16 make
+# If the variables are not specified, there should be a default in 'inc/types.h'.
+CXX_FLAGS += -DFXD_W_LENGTH=$(FXD_W_LENGTH)
+CXX_FLAGS += -DFXD_I_LENGTH=$(FXD_I_LENGTH)
 
 LD_FLAGS :=
 
@@ -58,18 +78,21 @@ VPATH += ../inc
 VPATH += ../src
 
 CXX_SOURCES :=
-CXX_SOURCES += activations.cc
+CXX_SOURCES += activation.cc
 CXX_SOURCES += fc.cc
 CXX_SOURCES += lstm.cc
 CXX_SOURCES += main.cc
 CXX_SOURCES += utils.cc
+CXX_SOURCES += wrapper.cc
 
 CXX_HEADERS :=
-CXX_HEADERS += activations.h
+CXX_HEADERS += activation.h
+# CXX_HEADERS += config.h
 CXX_HEADERS += constants.h
 CXX_HEADERS += fc.h
 CXX_HEADERS += lstm.h
 CXX_HEADERS += types.h
+CXX_HEADERS += wrapper.h
 CXX_HEADERS += utils.h
 
 .SUFFIXES: .cc .h .o
@@ -84,17 +107,17 @@ $(TARGET): $(CXX_OBJECTS)
 .cc.o:
 	$(QUIET_C)$(CC) $(CXX_FLAGS) ${INCDIR} -c $<
 
-lstm-debug: debug
+run-debug: debug
 	$(QUIET_RUN)./$(TARGET)
-.PHONY: lstm-debug
+.PHONY: run-debug
 
-lstm-release: release
+run-release: release
 	$(QUIET_RUN)./$(TARGET)
-.PHONY: lstm-release
+.PHONY: run-release
 
 run-profile: profile
 	$(QUIET_RUN)./$(TARGET)
-.PHONY: lstm-profile
+.PHONY: run-profile
 
 valgrind: debug
 	$(QUIET_RUN)valgrind -v --leak-check=full --max-stackframe=16777216 ./$(TARGET)
@@ -133,8 +156,3 @@ endif
 clean:
 	$(QUIET_CLEAN)rm -rf *.o $(TARGET) *.svg *.pdf *.dot *.sum
 .PHONY: clean
-
-# clear logs as well
-ultraclean:
-	$(QUIET_CLEAN)rm -rf *.o $(TARGET) *.log *.out *.svg *.pdf *.dot *.sum
-.PHONY: ultraclean

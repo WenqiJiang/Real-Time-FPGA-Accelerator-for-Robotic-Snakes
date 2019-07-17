@@ -3,8 +3,10 @@
 #include "constants.h"
 #include "types.h"
 
-void fc(const FDATA_T* fc_input_feature_map, const FDATA_T* fc_kernel,
-        const FDATA_T* fc_bias, FDATA_T* fc_output_feature_map) {
+void fc(const FDATA_T fc_input_feature_map[LSTM_STATE_SIZE_2],
+        const FDATA_T fc_kernel[FC_OUTPUT_SIZE * FC_INPUT_SIZE],
+        const FDATA_T fc_bias[FC_OUTPUT_SIZE],
+        FDATA_T fc_output_feature_map[FC_OUTPUT_SIZE]) {
   // input:
   // fc_input_feature_map: a vector with a size of FC_INPUT_SIZE
   // fc_kernel: FC_OUTPUT_SIZE x FC_INPUT_SIZE, notice that this kernel is

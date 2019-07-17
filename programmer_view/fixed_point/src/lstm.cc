@@ -8,10 +8,14 @@
 #include "utils.h"
 
 template <const int lstm_state_size, const int lstm_input_size>
-void gate_template(const FDATA_T* kernel_last_state,
-                   const FDATA_T* kernel_input_state,
-                   const FDATA_T* bias,  const FDATA_T* lstm_last_state,
-                   const FDATA_T* lstm_input_state, FDATA_T* result) {
+void gate_template(const FDATA_T kernel_last_state
+                       [lstm_state_size * lstm_state_size],
+                   const FDATA_T kernel_input_state
+                       [lstm_state_size * lstm_input_size],
+                   const FDATA_T bias[lstm_state_size],
+                   const FDATA_T lstm_last_state[lstm_state_size],
+                   const FDATA_T lstm_input_state[lstm_input_size],
+                   FDATA_T result[lstm_state_size]) {
 
   // input:
   // kernel_last_state: LSTM_STATE_SIZE * LSTM_STATE_SIZE,
@@ -59,11 +63,14 @@ void gate_template(const FDATA_T* kernel_last_state,
 }
 
 template <const int lstm_state_size, const int lstm_input_size>
-void forget_gate(const FDATA_T* forget_gate_kernel_last_state,
-                 const FDATA_T* forget_gate_kernel_input_state,
-                 const FDATA_T* forget_gate_bias,
-                 const FDATA_T* lstm_last_state,
-                 const FDATA_T* lstm_input_state, FDATA_T* forget_gate_result) {
+void forget_gate(const FDATA_T forget_gate_kernel_last_state
+                     [lstm_state_size * lstm_state_size],
+                 const FDATA_T forget_gate_kernel_input_state
+                     [lstm_state_size * lstm_input_size],
+                 const FDATA_T forget_gate_bias[lstm_state_size],
+                 const FDATA_T lstm_last_state[lstm_state_size],
+                 const FDATA_T lstm_input_state[lstm_input_size],
+                 FDATA_T forget_gate_result[lstm_state_size]) {
   // input:
   // forget_gate_kernel_last_state: LSTM_STATE_SIZE * LSTM_STATE_SIZE,
   //  notice that this kernel is transposed, i.e. lstm_last_state do
@@ -84,10 +91,14 @@ void forget_gate(const FDATA_T* forget_gate_kernel_last_state,
 }
 
 template <const int lstm_state_size, const int lstm_input_size>
-void input_gate(const FDATA_T* input_gate_kernel_last_state,
-                const FDATA_T* input_gate_kernel_input_state,
-                const FDATA_T* input_gate_bias, const FDATA_T* lstm_last_state,
-                const FDATA_T* lstm_input_state, FDATA_T* input_gate_result) {
+void input_gate(const FDATA_T input_gate_kernel_last_state
+                    [lstm_state_size * lstm_state_size],
+                const FDATA_T input_gate_kernel_input_state
+                    [lstm_state_size * lstm_input_size],
+                const FDATA_T input_gate_bias[lstm_state_size],
+                const FDATA_T lstm_last_state[lstm_state_size],
+                const FDATA_T lstm_input_state[lstm_input_size],
+                FDATA_T input_gate_result[lstm_state_size]) {
   // input:
   // input_gate_kernel_last_state: LSTM_STATE_SIZE * LSTM_STATE_SIZE,
   //  notice that this kernel is transposed, i.e. lstm_last_state do
@@ -108,10 +119,14 @@ void input_gate(const FDATA_T* input_gate_kernel_last_state,
 }
 
 template <const int lstm_state_size, const int lstm_input_size>
-void tanh_gate(const FDATA_T* tanh_gate_kernel_last_state,
-               const FDATA_T* tanh_gate_kernel_input_state,
-               const FDATA_T* tanh_gate_bias, const FDATA_T* lstm_last_state,
-               const FDATA_T* lstm_input_state, FDATA_T* tanh_gate_result) {
+void tanh_gate(const FDATA_T tanh_gate_kernel_last_state
+                   [lstm_state_size * lstm_state_size],
+               const FDATA_T tanh_gate_kernel_input_state
+                   [lstm_state_size * lstm_input_size],
+               const FDATA_T tanh_gate_bias[lstm_state_size],
+               const FDATA_T lstm_last_state[lstm_state_size],
+               const FDATA_T lstm_input_state[lstm_input_size],
+               FDATA_T tanh_gate_result[lstm_state_size]) {
   // input:
   // tanh_gate_kernel_last_state: LSTM_STATE_SIZE * LSTM_STATE_SIZE,
   //  notice that this kernel is transposed, i.e. lstm_last_state do
@@ -132,11 +147,14 @@ void tanh_gate(const FDATA_T* tanh_gate_kernel_last_state,
 }
 
 template <const int lstm_state_size, const int lstm_input_size>
-void output_gate(const FDATA_T* output_gate_kernel_last_state,
-                 const FDATA_T* output_gate_kernel_input_state,
-                 const FDATA_T* output_gate_bias,
-                 const FDATA_T* lstm_last_state,
-                 const FDATA_T* lstm_input_state, FDATA_T* output_gate_result) {
+void output_gate(const FDATA_T output_gate_kernel_last_state
+                     [lstm_state_size * lstm_state_size],
+                 const FDATA_T output_gate_kernel_input_state
+                     [lstm_state_size * lstm_input_size],
+                 const FDATA_T output_gate_bias[lstm_state_size],
+                 const FDATA_T lstm_last_state[lstm_state_size],
+                 const FDATA_T lstm_input_state[lstm_input_size],
+                 FDATA_T output_gate_result[lstm_state_size]) {
   // input:
   // output_gate_kernel_last_state: LSTM_STATE_SIZE * LSTM_STATE_SIZE,
   //  notice that this kernel is transposed, i.e. lstm_last_state do
@@ -157,8 +175,9 @@ void output_gate(const FDATA_T* output_gate_kernel_last_state,
 }
 
 template <const int lstm_state_size>
-void elementwise_mul(const FDATA_T* input_vector1, const FDATA_T* input_vector2,
-                     FDATA_T* output_vector) {
+void elementwise_mul(const FDATA_T input_vector1[lstm_state_size],
+                     const FDATA_T input_vector2[lstm_state_size],
+                     FDATA_T output_vector[lstm_state_size]) {
   // input: input_vectori, with a size of LSTM_STATE_SIZE
   // output: output_vector, with a size of LSTM_STATE_SIZE
 
@@ -168,26 +187,38 @@ void elementwise_mul(const FDATA_T* input_vector1, const FDATA_T* input_vector2,
   }
 }
 template <const int lstm_state_size, const int lstm_input_size>
-void lstm(const FDATA_T* forget_gate_kernel_last_state,
-          const FDATA_T* forget_gate_kernel_input_state,
-          const FDATA_T* forget_gate_bias,
-          const FDATA_T* input_gate_kernel_last_state,
-          const FDATA_T* input_gate_kernel_input_state,
-          const FDATA_T* input_gate_bias,
-          const FDATA_T* tanh_gate_kernel_last_state,
-          const FDATA_T* tanh_gate_kernel_input_state,
-          const FDATA_T* tanh_gate_bias,
-          const FDATA_T* output_gate_kernel_last_state,
-          const FDATA_T* output_gate_kernel_input_state,
-          const FDATA_T* output_gate_bias,
-          const FDATA_T* lstm_last_state, const FDATA_T* lstm_input_state,
-          const FDATA_T* last_candidate, FDATA_T* forget_gate_result,
-          FDATA_T* input_gate_result, FDATA_T* tanh_gate_result,
-          FDATA_T* output_gate_result,
-          FDATA_T* forget_gate_last_candidate_mul_cache,
-          FDATA_T* input_gate_tanh_gate_mul_cache,
-          FDATA_T* tanh_new_candidate_cache,
-          FDATA_T* new_candidate, FDATA_T* lstm_output_state) {
+void lstm(const FDATA_T forget_gate_kernel_last_state
+              [lstm_state_size * lstm_state_size],
+          const FDATA_T forget_gate_kernel_input_state
+              [lstm_state_size * lstm_input_size],
+          const FDATA_T forget_gate_bias[lstm_state_size],
+          const FDATA_T input_gate_kernel_last_state
+              [lstm_state_size * lstm_state_size],
+          const FDATA_T input_gate_kernel_input_state
+              [lstm_state_size * lstm_input_size],
+          const FDATA_T input_gate_bias[lstm_state_size],
+          const FDATA_T tanh_gate_kernel_last_state
+              [lstm_state_size * lstm_state_size],
+          const FDATA_T tanh_gate_kernel_input_state
+              [lstm_state_size * lstm_input_size],
+          const FDATA_T tanh_gate_bias[lstm_state_size],
+          const FDATA_T output_gate_kernel_last_state
+              [lstm_state_size * lstm_state_size],
+          const FDATA_T output_gate_kernel_input_state
+              [lstm_state_size * lstm_input_size],
+          const FDATA_T output_gate_bias[lstm_state_size],
+          const FDATA_T lstm_last_state[lstm_state_size],
+          const FDATA_T lstm_input_state[lstm_input_size],
+          const FDATA_T last_candidate[lstm_state_size],
+          FDATA_T forget_gate_result[lstm_state_size],
+          FDATA_T input_gate_result[lstm_state_size],
+          FDATA_T tanh_gate_result[lstm_state_size],
+          FDATA_T output_gate_result[lstm_state_size],
+          FDATA_T forget_gate_last_candidate_mul_cache[lstm_state_size],
+          FDATA_T input_gate_tanh_gate_mul_cache[lstm_state_size],
+          FDATA_T tanh_new_candidate_cache[lstm_state_size],
+          FDATA_T new_candidate[lstm_state_size],
+          FDATA_T lstm_output_state[lstm_state_size]) {
   // trick: intermediate results are inputs as well, they are malloced outside
   //  LSTM block, so that we don't need to malloc they in every single timestep.
   //  This will improve the software performance
@@ -244,46 +275,70 @@ void lstm(const FDATA_T* forget_gate_kernel_last_state,
 }
 
 // instantiation
-template void lstm<LSTM_STATE_SIZE_1, LSTM_INPUT_SIZE_1>
-    (const FDATA_T* forget_gate_kernel_last_state,
-          const FDATA_T* forget_gate_kernel_input_state,
-          const FDATA_T* forget_gate_bias,
-          const FDATA_T* input_gate_kernel_last_state,
-          const FDATA_T* input_gate_kernel_input_state,
-          const FDATA_T* input_gate_bias,
-          const FDATA_T* tanh_gate_kernel_last_state,
-          const FDATA_T* tanh_gate_kernel_input_state,
-          const FDATA_T* tanh_gate_bias,
-          const FDATA_T* output_gate_kernel_last_state,
-          const FDATA_T* output_gate_kernel_input_state,
-          const FDATA_T* output_gate_bias,
-          const FDATA_T* lstm_last_state, const FDATA_T* lstm_input_state,
-          const FDATA_T* last_candidate, FDATA_T* forget_gate_result,
-          FDATA_T* input_gate_result, FDATA_T* tanh_gate_result,
-          FDATA_T* output_gate_result,
-          FDATA_T* forget_gate_last_candidate_mul_cache,
-          FDATA_T* input_gate_tanh_gate_mul_cache,
-          FDATA_T* tanh_new_candidate_cache,
-          FDATA_T* new_candidate, FDATA_T* lstm_output_state);
+template void lstm<LSTM_STATE_SIZE_1, LSTM_INPUT_SIZE_1>(
+    const FDATA_T forget_gate_kernel_last_state
+        [LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1],
+    const FDATA_T forget_gate_kernel_input_state
+        [LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1],
+    const FDATA_T forget_gate_bias[LSTM_STATE_SIZE_1],
+    const FDATA_T input_gate_kernel_last_state
+        [LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1],
+    const FDATA_T input_gate_kernel_input_state
+        [LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1],
+    const FDATA_T input_gate_bias[LSTM_STATE_SIZE_1],
+    const FDATA_T tanh_gate_kernel_last_state
+        [LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1],
+    const FDATA_T tanh_gate_kernel_input_state
+        [LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1],
+    const FDATA_T tanh_gate_bias[LSTM_STATE_SIZE_1],
+    const FDATA_T output_gate_kernel_last_state
+        [LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1],
+    const FDATA_T output_gate_kernel_input_state
+        [LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1],
+    const FDATA_T output_gate_bias[LSTM_STATE_SIZE_1],
+    const FDATA_T lstm_last_state[LSTM_STATE_SIZE_1],
+    const FDATA_T lstm_input_state[LSTM_INPUT_SIZE_1],
+    const FDATA_T last_candidate[LSTM_STATE_SIZE_1],
+    FDATA_T forget_gate_result[LSTM_STATE_SIZE_1],
+    FDATA_T input_gate_result[LSTM_STATE_SIZE_1],
+    FDATA_T tanh_gate_result[LSTM_STATE_SIZE_1],
+    FDATA_T output_gate_result[LSTM_STATE_SIZE_1],
+    FDATA_T forget_gate_last_candidate_mul_cache[LSTM_STATE_SIZE_1],
+    FDATA_T input_gate_tanh_gate_mul_cache[LSTM_STATE_SIZE_1],
+    FDATA_T tanh_new_candidate_cache[LSTM_STATE_SIZE_1],
+    FDATA_T new_candidate[LSTM_STATE_SIZE_1],
+    FDATA_T lstm_output_state[LSTM_STATE_SIZE_1]);
 
-template void lstm<LSTM_STATE_SIZE_2, LSTM_INPUT_SIZE_2>
-    (const FDATA_T* forget_gate_kernel_last_state,
-          const FDATA_T* forget_gate_kernel_input_state,
-          const FDATA_T* forget_gate_bias,
-          const FDATA_T* input_gate_kernel_last_state,
-          const FDATA_T* input_gate_kernel_input_state,
-          const FDATA_T* input_gate_bias,
-          const FDATA_T* tanh_gate_kernel_last_state,
-          const FDATA_T* tanh_gate_kernel_input_state,
-          const FDATA_T* tanh_gate_bias,
-          const FDATA_T* output_gate_kernel_last_state,
-          const FDATA_T* output_gate_kernel_input_state,
-          const FDATA_T* output_gate_bias,
-          const FDATA_T* lstm_last_state, const FDATA_T* lstm_input_state,
-          const FDATA_T* last_candidate, FDATA_T* forget_gate_result,
-          FDATA_T* input_gate_result, FDATA_T* tanh_gate_result,
-          FDATA_T* output_gate_result,
-          FDATA_T* forget_gate_last_candidate_mul_cache,
-          FDATA_T* input_gate_tanh_gate_mul_cache,
-          FDATA_T* tanh_new_candidate_cache,
-          FDATA_T* new_candidate, FDATA_T* lstm_output_state);
+template void lstm<LSTM_STATE_SIZE_2, LSTM_INPUT_SIZE_2>(
+    const FDATA_T forget_gate_kernel_last_state
+        [LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2],
+    const FDATA_T forget_gate_kernel_input_state
+        [LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2],
+    const FDATA_T forget_gate_bias[LSTM_STATE_SIZE_2],
+    const FDATA_T input_gate_kernel_last_state
+        [LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2],
+    const FDATA_T input_gate_kernel_input_state
+        [LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2],
+    const FDATA_T input_gate_bias[LSTM_STATE_SIZE_2],
+    const FDATA_T tanh_gate_kernel_last_state
+        [LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2],
+    const FDATA_T tanh_gate_kernel_input_state
+        [LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2],
+    const FDATA_T tanh_gate_bias[LSTM_STATE_SIZE_2],
+    const FDATA_T output_gate_kernel_last_state
+        [LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2],
+    const FDATA_T output_gate_kernel_input_state
+        [LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2],
+    const FDATA_T output_gate_bias[LSTM_STATE_SIZE_2],
+    const FDATA_T lstm_last_state[LSTM_STATE_SIZE_2],
+    const FDATA_T lstm_input_state[LSTM_INPUT_SIZE_2],
+    const FDATA_T last_candidate[LSTM_STATE_SIZE_2],
+    FDATA_T forget_gate_result[LSTM_STATE_SIZE_2],
+    FDATA_T input_gate_result[LSTM_STATE_SIZE_2],
+    FDATA_T tanh_gate_result[LSTM_STATE_SIZE_2],
+    FDATA_T output_gate_result[LSTM_STATE_SIZE_2],
+    FDATA_T forget_gate_last_candidate_mul_cache[LSTM_STATE_SIZE_2],
+    FDATA_T input_gate_tanh_gate_mul_cache[LSTM_STATE_SIZE_2],
+    FDATA_T tanh_new_candidate_cache[LSTM_STATE_SIZE_2],
+    FDATA_T new_candidate[LSTM_STATE_SIZE_2],
+    FDATA_T lstm_output_state[LSTM_STATE_SIZE_2]);
