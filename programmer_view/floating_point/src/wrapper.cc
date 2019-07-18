@@ -1,6 +1,10 @@
 #include "wrapper.h"
 
 #include <cstdlib>
+#include <cstdio>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include "activations.h"
 #include "constants.h"
@@ -125,6 +129,12 @@ void wrapper(const FDATA_T forget_gate_kernel_last_state_1
 
   zero_init(fc_output_feature_map, FC_OUTPUT_SIZE);
 
+#define PROFILING
+#ifdef PROFILING
+  struct timespec start, finish;
+  clock_gettime(CLOCK_REALTIME, &start);
+#endif
+
   // ping-pong
   for (LDATA_T compute_time = 0; compute_time < COMPUTE_TIME / 2;
        compute_time++) {
@@ -205,6 +215,23 @@ void wrapper(const FDATA_T forget_gate_kernel_last_state_1
 
     results[compute_time*2+1] = argmax<FDATA_T, IDATA_T>(fc_output_feature_map);
   }
+
+#ifdef PROFILING
+  clock_gettime(CLOCK_REALTIME, &finish);
+
+  long seconds = finish.tv_sec - start.tv_sec;
+  long ns = finish.tv_nsec - start.tv_nsec;
+
+	if (start.tv_nsec > finish.tv_nsec) { // clock underflow
+	--seconds;
+	ns += 1000000000;
+  }
+
+  printf("seconds: %ld\n", seconds);
+  printf("nanoseconds: %ld\n", ns);
+  printf("total seconds: %e\n", (double)seconds + (double)ns/(double)1000000000);
+#endif
+
   // LSTM states
   MFREE(lstm_state1_1);
   MFREE(lstm_state2_1);

@@ -156,22 +156,6 @@ int main (int argc, char* argv[]) {
           output_gate_kernel_input_state_2, output_gate_bias_2, fc_kernel,
           fc_bias, lstm_input_state_1, results);
 
-#ifdef PROFILING
-  struct timespec start, finish;
-  clock_gettime(CLOCK_REALTIME, &start);
-#endif
-
-#ifdef PROFILING
-  clock_gettime(CLOCK_REALTIME, &finish);
-
-  long seconds = finish.tv_sec - start.tv_sec;
-  long ns = finish.tv_nsec - start.tv_nsec;
-
-  printf("seconds: %ld\n", seconds);
-  printf("nanoseconds: %ld\n", ns);
-  printf("total seconds: %e\n", (double)seconds + (double)ns/(double)1000000000);
-#endif
-
   printf("INFO: End Inference\n");
 #ifdef VERBOSE
   for (LDATA_T i = 0; i < FC_OUTPUT_SIZE; i++)
@@ -179,7 +163,7 @@ int main (int argc, char* argv[]) {
   printf("\n");
 #endif
 
-#define PRINT_RESULT
+// #define PRINT_RESULT
 #ifdef PRINT_RESULT
   for (LDATA_T i = 0; i < COMPUTE_TIME; i++) {
     printf("%d\t", results[i]);

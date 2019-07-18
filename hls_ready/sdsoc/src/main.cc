@@ -142,9 +142,17 @@ int main (int argc, char* argv[]) {
   printf("INFO: Finished allocating memory and loading weights\n");
   printf ("INFO: Start Inference\n");
 
+#ifdef __SDSCC__
+  perf_counter f_ctr;
+#endif
+
 #ifdef PROFILING
   struct timespec start, finish;
   clock_gettime(CLOCK_REALTIME, &start);
+#endif
+
+#ifdef __SDSCC__
+  f_ctr.start();
 #endif
 
   wrapper(forget_gate_kernel_last_state_1, forget_gate_kernel_input_state_1,
@@ -161,6 +169,10 @@ int main (int argc, char* argv[]) {
           output_gate_kernel_input_state_2, output_gate_bias_2, fc_kernel,
           fc_bias, lstm_input_state_1, results);
 
+#ifdef __SDSCC__
+  f_ctr.stop();
+#endif
+
 #ifdef PROFILING
   clock_gettime(CLOCK_REALTIME, &finish);
 
@@ -168,13 +180,18 @@ int main (int argc, char* argv[]) {
   long ns = finish.tv_nsec - start.tv_nsec;
 
   if (start.tv_nsec > finish.tv_nsec) { // clock underflow
-	--seconds;
-	ns += 1000000000;
+	  --seconds;
+	  ns += 1000000000;
   }
 
   printf("seconds: %ld\n", seconds);
   printf("nanoseconds: %ld\n", ns);
   printf("total seconds: %e\n", (double)seconds + (double)ns/(double)1000000000);
+#endif
+
+#ifdef __SDSCC__
+  printf("INFO:   cpu cycles %lu\n\r", f_ctr.avg_cpu_cycles());
+  f_ctr.reset();
 #endif
 
   printf("INFO: End Inference\n");
