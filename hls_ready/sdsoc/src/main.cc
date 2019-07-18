@@ -155,19 +155,20 @@ int main (int argc, char* argv[]) {
   f_ctr.start();
 #endif
 
-  wrapper(forget_gate_kernel_last_state_1, forget_gate_kernel_input_state_1,
-          forget_gate_bias_1, input_gate_kernel_last_state_1,
-          input_gate_kernel_input_state_1, input_gate_bias_1,
-          tanh_gate_kernel_last_state_1, tanh_gate_kernel_input_state_1,
-          tanh_gate_bias_1, output_gate_kernel_last_state_1,
-          output_gate_kernel_input_state_1, output_gate_bias_1,
-          forget_gate_kernel_last_state_2, forget_gate_kernel_input_state_2,
-          forget_gate_bias_2, input_gate_kernel_last_state_2,
-          input_gate_kernel_input_state_2, input_gate_bias_2,
-          tanh_gate_kernel_last_state_2, tanh_gate_kernel_input_state_2,
-          tanh_gate_bias_2, output_gate_kernel_last_state_2,
-          output_gate_kernel_input_state_2, output_gate_bias_2, fc_kernel,
-          fc_bias, lstm_input_state_1, results);
+  wrapper_inference(
+      forget_gate_kernel_last_state_1, forget_gate_kernel_input_state_1,
+      forget_gate_bias_1, input_gate_kernel_last_state_1,
+      input_gate_kernel_input_state_1, input_gate_bias_1,
+      tanh_gate_kernel_last_state_1, tanh_gate_kernel_input_state_1,
+      tanh_gate_bias_1, output_gate_kernel_last_state_1,
+      output_gate_kernel_input_state_1, output_gate_bias_1,
+      forget_gate_kernel_last_state_2, forget_gate_kernel_input_state_2,
+      forget_gate_bias_2, input_gate_kernel_last_state_2,
+      input_gate_kernel_input_state_2, input_gate_bias_2,
+      tanh_gate_kernel_last_state_2, tanh_gate_kernel_input_state_2,
+      tanh_gate_bias_2, output_gate_kernel_last_state_2,
+      output_gate_kernel_input_state_2, output_gate_bias_2, fc_kernel,
+      fc_bias, lstm_input_state_1, results);
 
 #ifdef __SDSCC__
   f_ctr.stop();

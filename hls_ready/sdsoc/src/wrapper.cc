@@ -2,10 +2,8 @@
 
 #include <cstdlib>
 
-#include "activations.h"
 #include "constants.h"
 #include "types.h"
-#include "utils.h"
 
 ////////////////////         TOP-LEVEL FUNCTION             ////////////////////
 
@@ -130,74 +128,38 @@ void wrapper_inference(
 
   // lstm caches (reuse this case in lstm cells, avoid malloc repeatly
   // Layer 1
-  FDATA_T* forget_gate_result_1 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
-  FDATA_T* input_gate_result_1 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
-  FDATA_T* tanh_gate_result_1 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
-  FDATA_T* output_gate_result_1 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
-  FDATA_T* forget_gate_last_candidate_mul_cache_1 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
-  FDATA_T* input_gate_tanh_gate_mul_cache_1 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
-  FDATA_T* tanh_new_candidate_cache_1 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T forget_gate_result_1[LSTM_STATE_SIZE_1];
+  FDATA_T input_gate_result_1[LSTM_STATE_SIZE_1];
+  FDATA_T tanh_gate_result_1[LSTM_STATE_SIZE_1];
+  FDATA_T output_gate_result_1[LSTM_STATE_SIZE_1];
+  FDATA_T forget_gate_last_candidate_mul_cache_1[LSTM_STATE_SIZE_1];
+  FDATA_T input_gate_tanh_gate_mul_cache_1[LSTM_STATE_SIZE_1];
+  FDATA_T tanh_new_candidate_cache_1[LSTM_STATE_SIZE_1];
 
   // Layer 2
-  FDATA_T* forget_gate_result_2 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
-  FDATA_T* input_gate_result_2 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
-  FDATA_T* tanh_gate_result_2 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
-  FDATA_T* output_gate_result_2 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
-  FDATA_T* forget_gate_last_candidate_mul_cache_2 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
-  FDATA_T* input_gate_tanh_gate_mul_cache_2 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
-  FDATA_T* tanh_new_candidate_cache_2 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T forget_gate_result_2[LSTM_STATE_SIZE_2];
+  FDATA_T input_gate_result_2[LSTM_STATE_SIZE_2];
+  FDATA_T tanh_gate_result_2[LSTM_STATE_SIZE_2];
+  FDATA_T output_gate_result_2[LSTM_STATE_SIZE_2];
+  FDATA_T forget_gate_last_candidate_mul_cache_2[LSTM_STATE_SIZE_2];
+  FDATA_T input_gate_tanh_gate_mul_cache_2[LSTM_STATE_SIZE_2];
+  FDATA_T tanh_new_candidate_cache_2[LSTM_STATE_SIZE_2];
 
   // LSTM states
   // ping-pong
-  FDATA_T* lstm_state1_1 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
-  FDATA_T* lstm_state2_1 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
-  FDATA_T* lstm_candidate1_1 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
-  FDATA_T* lstm_candidate2_1 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_1);
+  FDATA_T lstm_state1_1[LSTM_STATE_SIZE_1];
+  FDATA_T lstm_state2_1[LSTM_STATE_SIZE_1];
+  FDATA_T lstm_candidate1_1[LSTM_STATE_SIZE_1];
+  FDATA_T lstm_candidate2_1[LSTM_STATE_SIZE_1];
 
   // Layer 2
-  FDATA_T* lstm_state1_2 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
-  FDATA_T* lstm_state2_2 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
-  FDATA_T* lstm_candidate1_2 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
-  FDATA_T* lstm_candidate2_2 =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * LSTM_STATE_SIZE_2);
+  FDATA_T lstm_state1_2[LSTM_STATE_SIZE_2];
+  FDATA_T lstm_state2_2[LSTM_STATE_SIZE_2];
+  FDATA_T lstm_candidate1_2[LSTM_STATE_SIZE_2];
+  FDATA_T lstm_candidate2_2[LSTM_STATE_SIZE_2];
 
   // fc output
-  FDATA_T* fc_output_feature_map =
-      (FDATA_T*) MALLOC(sizeof(FDATA_T) * FC_OUTPUT_SIZE);
-
-  // init (all gates result will be init in "gate_template")
-  zero_init(lstm_state1_1, LSTM_STATE_SIZE_1);
-  zero_init(lstm_state2_1, LSTM_STATE_SIZE_1);
-  zero_init(lstm_candidate1_1, LSTM_STATE_SIZE_1);
-  zero_init(lstm_candidate2_1, LSTM_STATE_SIZE_1);
-
-  zero_init(lstm_state1_2, LSTM_STATE_SIZE_2);
-  zero_init(lstm_state2_2, LSTM_STATE_SIZE_2);
-  zero_init(lstm_candidate1_2, LSTM_STATE_SIZE_2);
-  zero_init(lstm_candidate2_2, LSTM_STATE_SIZE_2);
-
-  zero_init(fc_output_feature_map, FC_OUTPUT_SIZE);
+  FDATA_T fc_output_feature_map[FC_OUTPUT_SIZE];
 
   // ping-pong
   for (LDATA_T compute_time = 0; compute_time < COMPUTE_TIME / 2;
@@ -279,35 +241,8 @@ void wrapper_inference(
 
     results[compute_time*2+1] = argmax<FDATA_T, IDATA_T>(fc_output_feature_map);
   }
-  // LSTM states
-  MFREE(lstm_state1_1);
-  MFREE(lstm_state2_1);
-  MFREE(lstm_candidate1_1);
-  MFREE(lstm_candidate2_1);
-  MFREE(lstm_state1_2);
-  MFREE(lstm_state2_2);
-  MFREE(lstm_candidate1_2);
-  MFREE(lstm_candidate2_2);
-
-  // lstm caches
-  MFREE(forget_gate_result_1);
-  MFREE(input_gate_result_1);
-  MFREE(tanh_gate_result_1);
-  MFREE(output_gate_result_1);
-  MFREE(forget_gate_last_candidate_mul_cache_1);
-  MFREE(input_gate_tanh_gate_mul_cache_1);
-  MFREE(tanh_new_candidate_cache_1);
-  MFREE(forget_gate_result_2);
-  MFREE(input_gate_result_2);
-  MFREE(tanh_gate_result_2);
-  MFREE(output_gate_result_2);
-  MFREE(forget_gate_last_candidate_mul_cache_2);
-  MFREE(input_gate_tanh_gate_mul_cache_2);
-  MFREE(tanh_new_candidate_cache_2);
-
-  // fc output
-  MFREE(fc_output_feature_map);
 }
+
 ////////////////////               LSTM                     ////////////////////
 
 template <const int lstm_state_size, const int lstm_input_size>
@@ -677,5 +612,62 @@ void fc(const FDATA_T fc_input_feature_map[LSTM_STATE_SIZE_2],
     // add bias
     fc_output_feature_map[result_idx] += fc_bias[result_idx];
   }
+}
+
+////////////////////              Activations               ////////////////////
+
+template <>
+IDATA_T argmax(FDATA_T* input_array) {
+  // for fixed length array (FC_OUTPUT_SIZE)
+
+  // initialization
+  IDATA_T max_idx = 0;
+  FDATA_T max_val = input_array[0];
+
+  // find max
+  for (LDATA_T i = 0; i < FC_OUTPUT_SIZE; i++) {
+    if (input_array[i] > max_val) {
+      max_val = input_array[i];
+      max_idx = i;
+    }
+  }
+
+  return max_idx;
+}
+
+template <const int lstm_state_size>
+void tanh(FDATA_T* input_feature_map, FDATA_T* output_feature_map) {
+  // for fixed length array (LSTM_SIZE), input and output can be the SAME array
+
+  for (LDATA_T result_idx = 0; result_idx < lstm_state_size; result_idx++) {
+    output_feature_map[result_idx] =
+        FDATA_T(tanh(TOFLOAT(input_feature_map[result_idx])));
+  }
+}
+
+template <const int lstm_state_size>
+void sigmoid(FDATA_T* input_feature_map, FDATA_T* output_feature_map) {
+  // for fixed length array (LSTM_SIZE), input and output can be the SAME array
+
+  for (LDATA_T result_idx = 0; result_idx < lstm_state_size; result_idx++) {
+    output_feature_map[result_idx] =
+        1 / (1 + FDATA_T(exp(TOFLOAT(-input_feature_map[result_idx]))));
+  }
+}
+
+// // instantiation
+// template void tanh<LSTM_STATE_SIZE_1>(
+    // FDATA_T* input_feature_map, FDATA_T* output_feature_map);
+
+// template void sigmoid<LSTM_STATE_SIZE_1>(
+    // FDATA_T* input_feature_map, FDATA_T* output_feature_map);
+
+////////////////////                 Utils                  ////////////////////
+
+template<>
+void zero_init(FDATA_T* input_array, LDATA_T array_length)
+{
+    for(LDATA_T idx = 0; idx < array_length; idx++)
+        input_array[idx] = 0;
 }
 

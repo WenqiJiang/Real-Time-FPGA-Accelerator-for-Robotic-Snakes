@@ -13,26 +13,6 @@ void relu(FDATA_T* input_feature_map, FDATA_T* output_feature_map) {
   }
 }
 
-template <const int lstm_state_size>
-void tanh(FDATA_T* input_feature_map, FDATA_T* output_feature_map) {
-  // for fixed length array (LSTM_SIZE), input and output can be the SAME array
-
-  for (LDATA_T result_idx = 0; result_idx < lstm_state_size; result_idx++) {
-    output_feature_map[result_idx] =
-        FDATA_T(tanh(TOFLOAT(input_feature_map[result_idx])));
-  }
-}
-
-template <const int lstm_state_size>
-void sigmoid(FDATA_T* input_feature_map, FDATA_T* output_feature_map) {
-  // for fixed length array (LSTM_SIZE), input and output can be the SAME array
-
-  for (LDATA_T result_idx = 0; result_idx < lstm_state_size; result_idx++) {
-    output_feature_map[result_idx] =
-        1 / (1 + FDATA_T(exp(TOFLOAT(-input_feature_map[result_idx]))));
-  }
-}
-
 // template <>
 // void softmax (FDATA_T* input_feature_map,
               // FDATA_T* output_probability_distribution) {
@@ -50,30 +30,3 @@ void sigmoid(FDATA_T* input_feature_map, FDATA_T* output_feature_map) {
         // exp(input_feature_map[result_idx]) / denominator;
   // }
 // }
-
-template <>
-IDATA_T argmax(FDATA_T* input_array) {
-  // for fixed length array (FC_OUTPUT_SIZE)
-
-  // initialization
-  IDATA_T max_idx = 0;
-  FDATA_T max_val = input_array[0];
-
-  // find max
-  for (LDATA_T i = 0; i < FC_OUTPUT_SIZE; i++) {
-    if (input_array[i] > max_val) {
-      max_val = input_array[i];
-      max_idx = i;
-    }
-  }
-
-  return max_idx;
-}
-
-// instantiation
-template void tanh<LSTM_STATE_SIZE_1>(
-    FDATA_T* input_feature_map, FDATA_T* output_feature_map);
-
-template void sigmoid<LSTM_STATE_SIZE_1>(
-    FDATA_T* input_feature_map, FDATA_T* output_feature_map);
-

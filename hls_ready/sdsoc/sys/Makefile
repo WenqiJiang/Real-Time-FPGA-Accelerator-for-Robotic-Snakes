@@ -33,7 +33,7 @@ INCDIR :=
 INCDIR += -I../src
 
 CXX_HOST_SOURCES :=
-CXX_HOST_SOURCES += activation.cc
+CXX_HOST_SOURCES += activations.cc
 CXX_HOST_SOURCES += main.cc
 CXX_HOST_SOURCES += utils.cc
 CXX_HOST_SOURCES += wrapper.cc

@@ -153,3 +153,30 @@ void fc(const FDATA_T fc_input_feature_map[LSTM_STATE_SIZE_2],
         const FDATA_T fc_bias[FC_OUTPUT_SIZE],
         FDATA_T fc_output_feature_map[FC_OUTPUT_SIZE]);
 
+
+////////////////////              Activations               ////////////////////
+
+// for fixed length array (FC_OUTPUT_SIZE)
+template <typename FT, typename LT>
+LT argmax(FT* input_array);
+
+template <>
+IDATA_T argmax(FDATA_T* input_array);
+
+// for fixed length array (LSTM_SIZE), input and output can be the SAME array
+template <const int lstm_state_size>
+void tanh(FDATA_T* input_feature_map, FDATA_T* output_feature_map);
+
+// for fixed length array (LSTM_SIZE), input and output can be the SAME array
+template <const int lstm_state_size>
+void sigmoid(FDATA_T* input_feature_map, FDATA_T* output_feature_map);
+
+
+////////////////////                 Utils                  ////////////////////
+
+// initialize an array as all zeros
+template <typename FT, typename IT>
+void zero_init(FT* input_array, IT array_length);
+
+template<>
+void zero_init(FDATA_T* input_array, LDATA_T array_length);
