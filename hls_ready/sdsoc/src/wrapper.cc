@@ -417,15 +417,14 @@ void wrapper_inference(
 
 ////////////////////               LSTM                     ////////////////////
 
-template <const int lstm_state_size, const int lstm_input_size>
-void gate_template(const FDATA_T kernel_last_state
-                       [lstm_state_size * lstm_state_size],
-                   const FDATA_T kernel_input_state
-                       [lstm_state_size * lstm_input_size],
-                   const FDATA_T bias[lstm_state_size],
-                   const FDATA_T lstm_last_state[lstm_state_size],
-                   const FDATA_T lstm_input_state[lstm_input_size],
-                   FDATA_T result[lstm_state_size]) {
+template <LSTM_STATE_SIZE_1, LSTM_INPUT_SIZE_1>
+void gate_template(
+    const FDATA_T kernel_last_state[LSTM_STATE_SIZE_1 * LSTM_STATE_SIZE_1],
+    const FDATA_T kernel_input_state[LSTM_STATE_SIZE_1 * LSTM_INPUT_SIZE_1],
+    const FDATA_T bias[LSTM_STATE_SIZE_1],
+    const FDATA_T lstm_last_state[LSTM_STATE_SIZE_1],
+    const FDATA_T lstm_input_state[LSTM_INPUT_SIZE_1],
+    FDATA_T result[LSTM_STATE_SIZE_1]) {
 
   // input:
   // kernel_last_state: LSTM_STATE_SIZE * LSTM_STATE_SIZE,
@@ -440,35 +439,167 @@ void gate_template(const FDATA_T kernel_last_state
   // result: LSTM_STATE_SIZE
 
   // initialization
-  zero_init<FDATA_T, LDATA_T>(result, lstm_state_size);
+	FDATA_T local_reg[LSTM_STATE_SIZE_1][LSTM_STATE_SIZE_1 + LSTM_INPUT_SIZE_1];
+#pragma HLS array_partition variable=local_reg[output_state_index] complete
 
-  // last state
-  for (LDATA_T result_idx = 0; result_idx < lstm_state_size; result_idx++) {
+  for (LDATA_T output_state_index = 0; output_state_index < LSTM_STATE_SIZE_1;
+      output_state_index++) {
+#pragma HLS UNROLL complete
 
-    for (LDATA_T sum_idx = 0; sum_idx < lstm_state_size; sum_idx++) {
+    for (LDATA_T input_state_index = 0; input_state_index < LSTM_INPUT_SIZE_1;
+         input_state_index++) {
+#pragma HLS RESOURCE variable=local_reg[output_state_index] core=FMul_fulldsp
+#pragma HLS UNROLL complete
 
-      LDATA_T kernel_last_state_idx = result_idx * lstm_state_size + sum_idx;
-
-      result[result_idx] +=
-          kernel_last_state[kernel_last_state_idx] * lstm_last_state[sum_idx];
+      local_reg[output_state_index][input_state_index] =
+          kernel_input_state[output_state_index * LSTM_INPUT_SIZE_1 +
+                             input_state_index] *
+          lstm_input_state[input_state_index];
     }
-  }
 
-  // input state
-  for (LDATA_T result_idx = 0; result_idx < lstm_input_size; result_idx++) {
+    for (LDATA_T last_state_index = 0; last_state_index < LSTM_STATE_SIZE_1;
+         last_state_index++) {
+#pragma HLS RESOURCE variable=local_reg[output_state_index] core=FMul_fulldsp
+#pragma HLS UNROLL complete
 
-    for (LDATA_T sum_idx = 0; sum_idx < lstm_input_size; sum_idx++) {
-
-      LDATA_T kernel_input_state_idx = result_idx * lstm_input_size + sum_idx;
-
-      result[result_idx] +=
-          kernel_input_state[kernel_input_state_idx]*lstm_input_state[sum_idx];
+      local_reg[output_state_index][LSTM_INPUT_SIZE_1 + last_state_index] =
+          kernel_last_state[output_state_index * LSTM_STATE_SIZE_1 +
+                            last_state_index] *
+          lstm_last_state[last_state_index];
     }
-  }
 
-  // bias
-  for (LDATA_T result_idx = 0; result_idx < lstm_state_size; result_idx++) {
-    result[result_idx] += bias[result_idx];
+    ////// HACKING, suppose LSTM_INPUT_SIZE_1 + LSTM_STATE_SIZE_1 = 30 /////
+
+    // prefix sum
+    for (LDATA_T i = 0; i < 15; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][15 + i];
+    }
+
+    // 15 = 7 * 2 + 1 -> need 8 reg for next iteration
+    // the 15'th number will be copy to 8'th reg
+    for (LDATA_T i = 0; i < 7; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][7 + i];
+    }
+    local_reg[output_state_index][7] = local_reg[output_state_index][14];
+
+    // from 8, regular prefix sum
+    for (LDATA_T i = 0; i < 4; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][4 + i];
+    }
+
+    // from 8, regular prefix sum
+    for (LDATA_T i = 0; i < 2; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][2 + i];
+    }
+
+    // from 8, regular prefix sum
+    for (LDATA_T i = 0; i < 1; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][1 + i];
+    }
+
+    result[output_state_index] = bias[output_state_index] +
+                                 local_reg[output_state_index][0];
+  }
+}
+
+template <LSTM_STATE_SIZE_2, LSTM_INPUT_SIZE_2>
+void gate_template(
+    const FDATA_T kernel_last_state[LSTM_STATE_SIZE_2 * LSTM_STATE_SIZE_2],
+    const FDATA_T kernel_input_state[LSTM_STATE_SIZE_2 * LSTM_INPUT_SIZE_2],
+    const FDATA_T bias[LSTM_STATE_SIZE_2],
+    const FDATA_T lstm_last_state[LSTM_STATE_SIZE_2],
+    const FDATA_T lstm_input_state[LSTM_INPUT_SIZE_2],
+    FDATA_T result[LSTM_STATE_SIZE_2]) {
+
+  // input:
+  // kernel_last_state: LSTM_STATE_SIZE * LSTM_STATE_SIZE,
+  //  notice that this kernel is transposed, i.e. lstm_last_state do
+  //  multiplication with each single row instead of each single column
+  // kernel_input_state: LSTM_STATE_SIZE * LSTM_INPUT_SIZE,
+  // notice that this kernel is transposed
+  // bias: LSTM_STATE_SIZE
+  // lstm_last_state: a single state, no batch, LSTM_STATE_SIZE
+  // lstm_input_state: a single state, no batch, LSTM_INPUT_SIZE
+  // output:
+  // result: LSTM_STATE_SIZE
+
+  // initialization
+	FDATA_T local_reg[LSTM_STATE_SIZE_2][LSTM_STATE_SIZE_2 + LSTM_INPUT_SIZE_2];
+#pragma HLS array_partition variable=local_reg[output_state_index] complete
+
+  for (LDATA_T output_state_index = 0; output_state_index < LSTM_STATE_SIZE_2;
+      output_state_index++) {
+#pragma HLS UNROLL complete
+
+    for (LDATA_T input_state_index = 0; input_state_index < LSTM_INPUT_SIZE_2;
+         input_state_index++) {
+#pragma HLS RESOURCE variable=local_reg[output_state_index] core=FMul_fulldsp
+#pragma HLS UNROLL complete
+
+      local_reg[output_state_index][input_state_index] =
+          kernel_input_state[output_state_index * LSTM_INPUT_SIZE_2 +
+                             input_state_index] *
+          lstm_input_state[input_state_index];
+    }
+
+    for (LDATA_T last_state_index = 0; last_state_index < LSTM_STATE_SIZE_2;
+         last_state_index++) {
+#pragma HLS RESOURCE variable=local_reg[output_state_index] core=FMul_fulldsp
+#pragma HLS UNROLL complete
+
+      local_reg[output_state_index][LSTM_INPUT_SIZE_2 + last_state_index] =
+          kernel_last_state[output_state_index * LSTM_STATE_SIZE_2 +
+                            last_state_index] *
+          lstm_last_state[last_state_index];
+    }
+
+    ////// HACKING, suppose LSTM_INPUT_SIZE_2 + LSTM_STATE_SIZE_2 = 32 /////
+
+    // prefix sum
+    for (LDATA_T i = 0; i < 16; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][16 + i];
+    }
+
+    for (LDATA_T i = 0; i < 8; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][8 + i];
+    }
+
+    for (LDATA_T i = 0; i < 4; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][4 + i];
+    }
+
+    // from 8, regular prefix sum
+    for (LDATA_T i = 0; i < 2; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][2 + i];
+    }
+
+    // from 8, regular prefix sum
+    for (LDATA_T i = 0; i < 1; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][1 + i];
+    }
+
+    result[output_state_index] = bias[output_state_index] +
+                                 local_reg[output_state_index][0];
   }
 }
 
@@ -767,22 +898,55 @@ void fc(const FDATA_T fc_input_feature_map[LSTM_STATE_SIZE_2],
   // output:
   // fc_output_feature_map: a vector with a size of FC_OUTPUT_SIZE
 
-  for (IDATA_T result_idx = 0; result_idx < FC_OUTPUT_SIZE; result_idx++) {
+  // initialization
+	FDATA_T local_reg[FC_OUTPUT_SIZE][FC_INPUT_SIZE];
+#pragma HLS array_partition variable=local_reg[output_state_index] complete
 
-    // initialization
-    fc_output_feature_map[result_idx] = 0;
+  for (LDATA_T output_state_index = 0; output_state_index < FC_OUTPUT_SIZE;
+      output_state_index++) {
+#pragma HLS UNROLL complete
 
-    // matrix multiplication
-    for (IDATA_T sum_idx = 0; sum_idx < FC_INPUT_SIZE; sum_idx++) {
+    for (LDATA_T input_state_index = 0; input_state_index < FC_INPUT_SIZE;
+         input_state_index++) {
+#pragma HLS RESOURCE variable=local_reg[output_state_index] core=FMul_fulldsp
+#pragma HLS UNROLL complete
 
-      IDATA_T fc_kernel_idx = result_idx * FC_INPUT_SIZE + sum_idx;
-
-      fc_output_feature_map[result_idx] += fc_kernel[fc_kernel_idx] *
-                                           fc_input_feature_map[sum_idx];
+      local_reg[output_state_index][input_state_index] =
+          fc_kernel[output_state_index * FC_INPUT_SIZE + input_state_index] *
+          fc_input_feature_map[input_state_index];
     }
 
-    // add bias
-    fc_output_feature_map[result_idx] += fc_bias[result_idx];
+    ////// HACKING, suppose FC_INPUT_SIZE = 16 /////
+
+    // prefix sum
+    for (LDATA_T i = 0; i < 8; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][8 + i];
+    }
+
+    for (LDATA_T i = 0; i < 4; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][4 + i];
+    }
+
+    // from 8, regular prefix sum
+    for (LDATA_T i = 0; i < 2; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][2 + i];
+    }
+
+    // from 8, regular prefix sum
+    for (LDATA_T i = 0; i < 1; i++) {
+#pragma HLS UNROLL complete
+      local_reg[output_state_index][i] = local_reg[output_state_index][i] +
+          local_reg[output_state_index][1 + i];
+    }
+
+    fc_output_feature_map[output_state_index] =
+        fc_bias[output_state_index] + local_reg[output_state_index][0];
   }
 }
 
@@ -816,13 +980,6 @@ void sigmoid(FDATA_T* input_feature_map, FDATA_T* output_feature_map) {
     // FDATA_T* input_feature_map, FDATA_T* output_feature_map);
 
 ////////////////////                 Utils                  ////////////////////
-
-template<>
-void zero_init(FDATA_T* input_array, LDATA_T array_length)
-{
-    for(LDATA_T idx = 0; idx < array_length; idx++)
-        input_array[idx] = 0;
-}
 
 template <const int length>
 void copy_array(FDATA_T* dst, FDATA_T* src) {

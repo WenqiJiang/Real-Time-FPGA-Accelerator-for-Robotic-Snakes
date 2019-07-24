@@ -166,14 +166,6 @@ void sigmoid(FDATA_T* input_feature_map, FDATA_T* output_feature_map);
 
 ////////////////////                 Utils                  ////////////////////
 
-// initialize an array as all zeros
-template <typename FT, typename IT>
-void zero_init(FT* input_array, IT array_length);
-
-// specification
-template<>
-void zero_init(FDATA_T* input_array, LDATA_T array_length);
-
 // copy array between BRAM and DRAM, thus no array partition, pipeline only
 template <const int length>
 void copy_array(FDATA_T* dst, FDATA_T* src);
